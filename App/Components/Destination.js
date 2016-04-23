@@ -1,8 +1,7 @@
 var React = require('react-native');
 var Firebase = require('firebase');
 var api = require('../Utils/api');
-var Destination = require('./Destination');
-
+var Transportation = require('./Transportation');
 
 var {
   View,
@@ -14,7 +13,7 @@ var {
   ActivityIndicatorIOS,
 } = React;
 
-class Home extends React.Component{
+class Destination extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
@@ -26,15 +25,15 @@ class Home extends React.Component{
     };
   }
 
-  addHomeAddress() {
-    console.log(this.state);
+  addDestinationAddress() {
     this.props.navigator.push({
-      title: 'Destination',
-      component: Destination,
+      title: 'Transportation',
+      component: Transportation,
       passProps: {
         colorArr: this.props.colorArr,
         color: this.props.color,
-        home: {
+        home: this.props.home,
+        destination: {
           address: this.state.address,
           city: this.state.city,
           state: this.state.state
@@ -70,9 +69,9 @@ class Home extends React.Component{
     return (
       <View style={[styles.mainContainer, {backgroundColor: this.props.colorArr[this.props.color].bg}]}>
 
-        <Text style={styles.title}>Where do you start from everyday?</Text>
+        <Text style={styles.title}>Where do you head to everyday?</Text>
 
-        <Text style={styles.pageText}>Home Address</Text>
+        <Text style={styles.pageText}>Destination Address</Text>
         <TextInput
           placeholder='Home Address'
           autoCapitalize='none'
@@ -107,7 +106,7 @@ class Home extends React.Component{
 
         <TouchableHighlight
           style={styles.button}
-          onPress={this.addHomeAddress.bind(this)}
+          onPress={this.addDestinationAddress.bind(this)}
           underlayColor='white' >
             <Text style={styles.buttonText}> TEST </Text>
         </TouchableHighlight>
@@ -166,4 +165,4 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = Home;
+module.exports = Destination;
