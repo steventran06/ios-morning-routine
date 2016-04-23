@@ -18,7 +18,6 @@ class Signup extends React.Component{
     super(props);
     this.state = {
       email:  '',
-      phone: '',
       password: '',
       isLoading: false,
       error: false
@@ -53,7 +52,8 @@ class Signup extends React.Component{
           title: 'HOME',
           component: Home,
           passProps: {
-
+            colorArr: this.props.colorArr,
+            color: this.props.color
           }
         });
       }

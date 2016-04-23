@@ -115,7 +115,9 @@ class Login extends React.Component{
         that.props.navigator.push({
           component: Home,
           passProps: {
-            userInfo: authData
+            userInfo: authData,
+            colorArr: that.state.colorArr,
+            color: that.state.color
           }
         });
         that.setState({
