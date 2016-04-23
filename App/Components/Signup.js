@@ -2,8 +2,6 @@ var React = require('react-native');
 var Firebase = require('firebase');
 var api = require('../Utils/api');
 var Home = require('./Home');
-// var UserDetails = require('./UserDetails');
-// var SignupAddInfo = require('./SignupAddInfo');
 
 var {
   View,
@@ -35,7 +33,6 @@ class Signup extends React.Component{
 
     // Using Firebase to create new user
     var that = this;
-
     var ref = new Firebase("https://morning-routine.firebaseio.com");
     ref.createUser({
       email    : that.state.email,
@@ -48,7 +45,9 @@ class Signup extends React.Component{
           isLoading: false 
         });
       } else {
-        console.log("Successfully created user account with uid:", userData.uid);
+        console.log("Successfully created user account with uid:", userData);
+        // Add user to Database;
+        api.addUser(userData, that.state.email);
         // navigate to Dashboard
         that.props.navigator.push({
           title: 'HOME',
@@ -59,11 +58,14 @@ class Signup extends React.Component{
         });
       }
     });
-    // Afterwards, clear state for Main component
-    this.setState({
-      isLoading: false,
-      error: false,
-    });
+    setTimeout(() => {
+      //Afterwards, clear state for Login component
+      this.setState({
+        error: false,
+        email: '',
+        password: ''
+      });
+    }, 3000);
   }
 
   handleEmail(event) {
@@ -82,11 +84,11 @@ class Signup extends React.Component{
   render() {
     // Show an error if API request fails
     var showErr = (
-      this.state.error ? <Text style={styles.updateAlert}> {this.state.error} </Text> : <View></View>
+      this.state.error ? <Text style={[styles.updateAlert, {color: this.props.colorArr[this.props.color].link}]}> {this.state.error} </Text> : <View></View>
     );
 
     return (
-      <View style={styles.mainContainer}>
+      <View style={[styles.mainContainer, {backgroundColor: this.props.colorArr[this.props.color].bg}]}>
         <Image style={styles.logo} source={require('../Assets/morningroutineiconLRG.png')} />
         <Text style={styles.title}>Sign Up</Text>
 
@@ -94,7 +96,7 @@ class Signup extends React.Component{
         <TextInput
           placeholder='Email'
           autoCapitalize='none'
-          style={styles.signupInput}
+          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
           value={this.state.email}
           onChange={this.handleEmail.bind(this)} />
 
@@ -103,7 +105,7 @@ class Signup extends React.Component{
           placeholder='Password'
           autoCapitalize='none'
           secureTextEntry={true}
-          style={styles.signupInput}
+          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
           value={this.state.password}
           onChange={this.handlePassword.bind(this)} />
         <ActivityIndicatorIOS
@@ -130,11 +132,18 @@ var styles = StyleSheet.create({
     padding: 20,
     marginTop: 40,
     flexDirection: 'column',
-    justifyContent: 'center',
-    backgroundColor:'#498183'
+    justifyContent: 'center'
+  },
+  signupInput: {
+    paddingLeft: 5,
+    height: 50,
+    borderRadius: 8,
+    marginBottom: 10,
+    marginTop: 5,
+    alignSelf: 'stretch',
+    justifyContent: 'center'
   },
   updateAlert: {
-    color: '#feb732',
     textAlign: 'center'
   },
   pageText: {
@@ -151,16 +160,6 @@ var styles = StyleSheet.create({
     fontSize: 25,
     textAlign: 'center',
     color: '#fff'
-  },
-  signupInput: {
-    paddingLeft: 5,
-    height: 50,
-    borderRadius: 8,
-    marginBottom: 10,
-    marginTop: 5,
-    backgroundColor: '#9dc7c9',
-    alignSelf: 'stretch',
-    justifyContent: 'center'
   },
   button: {
     height: 45,

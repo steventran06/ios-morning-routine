@@ -22,9 +22,56 @@ class Login extends React.Component{
     this.state = {
       email:  '',
       password: '',
+      color: 4,
       isLoading: false,
-      error: false
+      error: false,
+      colorArr: [
+        {bg: '#E8B376', txt: '#f0cfa8', link: '#7a76e8'},
+        {bg: '#FFD381', txt: '#ffe8bc', link: '#9481ff'},
+        {bg: '#FFBA8E', txt: '#ffdec9', link: '#8e9bff'},
+        {bg: '#E89276', txt: '#f0baa8', link: '#7693e8'},
+        {bg: '#FF8E81', txt: '#ffc3bc', link: '#81b3ff'}
+      ]
     };
+  }
+
+  componentWillMount() {
+    var date = new Date();
+    var currentTime = (date.getHours()* 60 * 60) + (date.getMinutes() * 60) + (date.getSeconds());
+    var that = this;
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
+      api.getSunriseTime(lat, lng)
+      .then(function(data) {
+        var utcSunrise = api.convertTime(data.results.sunrise);
+        api.getTimezone(lat, lng)
+        .then(function(timezone) {
+          var localSunrise = utcSunrise + timezone.rawOffset;
+          var timeFromSunrise = localSunrise - currentTime;
+          if (Math.abs(timeFromSunrise) < 1800) {
+            that.setState({
+              color: 1
+            });
+          } else if (timeFromSunrise > 1800 && timeFromSunrise < 18000) {
+            that.setState({
+              color: 0
+            });
+          } else if (timeFromSunrise < -1800 && timeFromSunrise > -5400) {
+            that.setState({
+              color: 2
+            });
+
+          } else if (timeFromSunrise < -5400 && timeFromSunrise > -9000) {
+            that.setState({
+              color: 3
+            });
+          }
+        });
+        
+      });
+    });
   }
 
   handleEmail(event) {
@@ -64,42 +111,49 @@ class Login extends React.Component{
 
       } else {
         console.log("Authenticated successfully with payload:", authData);
-        // navigate to Dashboard
+        // navigate to Home
         that.props.navigator.push({
           component: Home,
           passProps: {
             userInfo: authData
           }
         });
+        that.setState({
+          isLoading: false
+        });
       }
     });
 
     setTimeout(() => {
-      //Afterwards, clear state for Main component
+      //Afterwards, clear state for login component
       this.setState({
         error: false,
         email: '',
         password: ''
       });
-    }, 4000);
+    }, 3000);
   }
 
 
   goToSignup() {
     this.props.navigator.push({
       title: 'Sign Up',
-      component: Signup
+      component: Signup,
+      passProps: {
+        colorArr: this.state.colorArr,
+        color: this.state.color
+      }
     });
   }
 
   render() {
     // Show an error if API request fails
     var showErr = (
-      this.state.error ? <Text style={styles.alertText}> {this.state.error} </Text> : <View></View>
+      this.state.error ? <Text style={[styles.alertText, {color: this.state.colorArr[this.state.color].link}]}> {this.state.error} </Text> : <View></View>
     );
 
     return (
-        <View style={styles.mainContainer}>
+        <View style={[styles.mainContainer, {backgroundColor: this.state.colorArr[this.state.color].bg}]}>
           <Image style={styles.logo} source={require('../Assets/morningroutineiconLRG.png')} />
           <Text style={styles.title}>Morning Routine</Text>
 
@@ -107,7 +161,7 @@ class Login extends React.Component{
           <TextInput
             placeholder='Email'
             autoCapitalize='none'
-            style={styles.loginInput}
+            style={[styles.loginInput, {backgroundColor: this.state.colorArr[this.state.color].txt}]}
             value={this.state.email}
             onChange={this.handleEmail.bind(this)} />
 
@@ -116,7 +170,7 @@ class Login extends React.Component{
             placeholder='Password'
             autoCapitalize='none'
             secureTextEntry={true}
-            style={styles.loginInput}
+            style={[styles.loginInput, {backgroundColor: this.state.colorArr[this.state.color].txt}]}
             value={this.state.password}
             onChange={this.handlePassword.bind(this)} />
           <ActivityIndicatorIOS
@@ -136,13 +190,14 @@ class Login extends React.Component{
           <TouchableHighlight
             onPress={this.goToSignup.bind(this)}
             underlayColor='white' >
-              <Text style={styles.linkText}>Sign up now!</Text>
+              <Text style={[styles.linkText, {color: this.state.colorArr[this.state.color].link}]}>Sign up now!</Text>
           </TouchableHighlight>
 
         </View>
       )
   }
 }
+
 
 // stylesheet
 var styles = StyleSheet.create({
@@ -151,26 +206,7 @@ var styles = StyleSheet.create({
     padding: 20,
     marginTop: 30,
     flexDirection: 'column',
-    justifyContent: 'center',
-    backgroundColor:'#498183'
-  },
-  pageText: {
-    color: '#fff'
-  },
-  alertText: {
-    color: '#feb732',
-    fontSize: 15
-  },
-  linkText: {
-    color: '#feb732',
-    fontSize: 15,
-    textAlign: 'center'
-  },
-  title: {
-    marginBottom: 10,
-    fontSize: 25,
-    textAlign: 'center',
-    color: '#fff'
+    justifyContent: 'center'
   },
   loginInput: {
     paddingLeft: 5,
@@ -178,9 +214,24 @@ var styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
     marginTop: 5,
-    backgroundColor: '#9dc7c9',
     alignSelf: 'stretch',
     justifyContent: 'center'
+  },
+  linkText: {
+    fontSize: 15,
+    textAlign: 'center',
+  },
+  alertText: {
+    fontSize: 15
+  },
+  pageText: {
+    color: '#fff'
+  },
+  title: {
+    marginBottom: 10,
+    fontSize: 25,
+    textAlign: 'center',
+    color: '#fff'
   },
   button: {
     height: 45,
