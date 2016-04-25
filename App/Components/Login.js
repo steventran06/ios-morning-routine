@@ -2,8 +2,7 @@ var React = require('react-native');
 var Firebase = require('firebase');
 var api = require('../Utils/api');
 var Signup = require('./Signup');
-var Home = require('./Home');
-// var TabBar = require('./TabBar');
+var HomeAddress = require('./HomeAddress');
 
 var {
   View,
@@ -45,25 +44,29 @@ class Login extends React.Component{
       var lng = position.coords.longitude;
       api.getSunriseTime(lat, lng)
       .then(function(data) {
-        var utcSunrise = api.convertTime(data.results.sunrise);
+        var utcSunrise = api.convertTimeToSeconds(data.results.sunrise);
         api.getTimezone(lat, lng)
         .then(function(timezone) {
           var localSunrise = utcSunrise + timezone.rawOffset;
           var timeFromSunrise = localSunrise - currentTime;
-          if (Math.abs(timeFromSunrise) < 1800) {
+          var hour = 60*60;
+          // within half an hour of sunset
+          if (Math.abs(timeFromSunrise) < (0.5 * hour)) {
             that.setState({
               color: 1
             });
-          } else if (timeFromSunrise > 1800 && timeFromSunrise < 18000) {
+          // from 5 hours before sunrise to 30 minutes before
+          } else if (timeFromSunrise > (0.5 * hour) && timeFromSunrise < (5 * hour)) {
             that.setState({
               color: 0
             });
-          } else if (timeFromSunrise < -1800 && timeFromSunrise > -5400) {
+          // from 30 minutes after sunrise to 1.5 hours after sunrise
+          } else if (timeFromSunrise < (-0.5 * hour) && timeFromSunrise > (-1.5 * hour)) {
             that.setState({
               color: 2
             });
-
-          } else if (timeFromSunrise < -5400 && timeFromSunrise > -9000) {
+          // from 1.5 hours after sunrise to 2.5 hours after sunrise
+          } else if (timeFromSunrise < (-1.5 * hour) && timeFromSunrise > (-2.5 * hour)) {
             that.setState({
               color: 3
             });
@@ -111,11 +114,11 @@ class Login extends React.Component{
 
       } else {
         console.log("Authenticated successfully with payload:", authData);
-        // navigate to Home
+        // navigate to HomeAddress
         that.props.navigator.push({
-          component: Home,
+          component: HomeAddress,
           passProps: {
-            userInfo: authData,
+            auth: authData.uid,
             colorArr: that.state.colorArr,
             color: that.state.color
           }
@@ -163,7 +166,8 @@ class Login extends React.Component{
           <TextInput
             placeholder='Email'
             autoCapitalize='none'
-            style={[styles.loginInput, {backgroundColor: this.state.colorArr[this.state.color].txt}]}
+            autoCorrect={false}
+            style={[styles.input, {backgroundColor: this.state.colorArr[this.state.color].txt}]}
             value={this.state.email}
             onChange={this.handleEmail.bind(this)} />
 
@@ -172,7 +176,7 @@ class Login extends React.Component{
             placeholder='Password'
             autoCapitalize='none'
             secureTextEntry={true}
-            style={[styles.loginInput, {backgroundColor: this.state.colorArr[this.state.color].txt}]}
+            style={[styles.input, {backgroundColor: this.state.colorArr[this.state.color].txt}]}
             value={this.state.password}
             onChange={this.handlePassword.bind(this)} />
           <ActivityIndicatorIOS
@@ -210,7 +214,7 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center'
   },
-  loginInput: {
+  input: {
     paddingLeft: 5,
     height: 50,
     borderRadius: 8,

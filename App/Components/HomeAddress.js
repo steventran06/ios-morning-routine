@@ -1,7 +1,8 @@
 var React = require('react-native');
 var Firebase = require('firebase');
 var api = require('../Utils/api');
-var Transportation = require('./Transportation');
+var DestinationAddress = require('./DestinationAddress');
+
 
 var {
   View,
@@ -13,7 +14,7 @@ var {
   ActivityIndicatorIOS,
 } = React;
 
-class Destination extends React.Component{
+class Home extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
@@ -25,15 +26,15 @@ class Destination extends React.Component{
     };
   }
 
-  addDestinationAddress() {
+  addHomeAddress() {
     this.props.navigator.push({
-      title: 'Transportation',
-      component: Transportation,
+      title: 'Destination',
+      component: DestinationAddress,
       passProps: {
         colorArr: this.props.colorArr,
         color: this.props.color,
-        home: this.props.home,
-        destination: {
+        auth: this.props.auth,
+        home: {
           address: this.state.address,
           city: this.state.city,
           state: this.state.state
@@ -41,7 +42,6 @@ class Destination extends React.Component{
       }
     });
   }
-
 
   handleAddress(event) {
     this.setState({
@@ -55,7 +55,6 @@ class Destination extends React.Component{
     });
   }
 
-
   render() {
     
     // Show an error if API request fails
@@ -64,18 +63,19 @@ class Destination extends React.Component{
     );
 
     var PickerItemIOS = PickerIOS.Item;
-    var cars = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
+    var states = ["", "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
     return (
       <View style={[styles.mainContainer, {backgroundColor: this.props.colorArr[this.props.color].bg}]}>
 
-        <Text style={styles.title}>Where do you head to everyday?</Text>
+        <Text style={styles.title}>Where do you start from everyday?</Text>
 
-        <Text style={styles.pageText}>Destination Address</Text>
+        <Text style={styles.pageText}>Home Address</Text>
         <TextInput
           placeholder='Home Address'
           autoCapitalize='none'
-          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
+          autoCorrect={false}
+          style={[styles.input, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
           value={this.state.home}
           onChange={this.handleAddress.bind(this)} />
 
@@ -83,14 +83,15 @@ class Destination extends React.Component{
         <TextInput
           placeholder='City'
           autoCapitalize='none'
-          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
+          autoCorrect={false}
+          style={[styles.input, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
           value={this.state.work}
           onChange={this.handleCity.bind(this)} />
 
         <PickerIOS
           selectedValue={this.state.state}
           onValueChange={(state) => this.setState({state})}>
-          {cars.map((state) => (
+          {states.map((state) => (
             <PickerItemIOS
               key={state}
               value={state}
@@ -106,9 +107,9 @@ class Destination extends React.Component{
 
         <TouchableHighlight
           style={styles.button}
-          onPress={this.addDestinationAddress.bind(this)}
+          onPress={this.addHomeAddress.bind(this)}
           underlayColor='white' >
-            <Text style={styles.buttonText}> TEST </Text>
+            <Text style={styles.buttonText}> Submit </Text>
         </TouchableHighlight>
       </View>
     )
@@ -124,7 +125,7 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center'
   },
-  signupInput: {
+  input: {
     paddingLeft: 5,
     height: 50,
     borderRadius: 8,
@@ -165,4 +166,4 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = Destination;
+module.exports = Home;

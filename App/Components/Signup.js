@@ -1,7 +1,8 @@
 var React = require('react-native');
 var Firebase = require('firebase');
 var api = require('../Utils/api');
-var Home = require('./Home');
+var PostSignup = require('./PostSignup');
+
 
 var {
   View,
@@ -46,14 +47,14 @@ class Signup extends React.Component{
       } else {
         console.log("Successfully created user account with uid:", userData);
         // Add user to Database;
-        api.addUser(userData, that.state.email);
+        api.addUser(userData.uid, that.state.email);
         // navigate to Dashboard
         that.props.navigator.push({
-          title: 'HOME',
-          component: Home,
+          component: PostSignup,
           passProps: {
-            colorArr: this.props.colorArr,
-            color: this.props.color
+            colorArr: that.props.colorArr,
+            color: that.props.color,
+            auth: userData.uid
           }
         });
       }
@@ -96,7 +97,8 @@ class Signup extends React.Component{
         <TextInput
           placeholder='Email'
           autoCapitalize='none'
-          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
+          autoCorrect={false}
+          style={[styles.input, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
           value={this.state.email}
           onChange={this.handleEmail.bind(this)} />
 
@@ -105,7 +107,7 @@ class Signup extends React.Component{
           placeholder='Password'
           autoCapitalize='none'
           secureTextEntry={true}
-          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
+          style={[styles.input, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
           value={this.state.password}
           onChange={this.handlePassword.bind(this)} />
         <ActivityIndicatorIOS
@@ -134,7 +136,7 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center'
   },
-  signupInput: {
+  input: {
     paddingLeft: 5,
     height: 50,
     borderRadius: 8,

@@ -1,12 +1,13 @@
 var React = require('react-native');
 var Firebase = require('firebase');
 var api = require('../Utils/api');
+var CheckInfo = require('./CheckInfo');
 
 var {
   View,
   Text,
+  DatePickerIOS,
   StyleSheet,
-  TextInput,
   PickerIOS,
   TouchableHighlight,
   ActivityIndicatorIOS,
@@ -16,85 +17,87 @@ class Transportation extends React.Component{
   constructor(props) {
     super(props);
     this.state = {
-      address: '',
-      city: '',
-      state: '',
-      isLoading: false,
-      error: false
+      transportation: 'Driving',
+      arrivalTime: null,
+      date: new Date(),
+      error: false,
+      duration: ''
     };
   }
 
-  addDestinationAddress() {
-    console.log(this.props);
+  addTransportation() {
+    var arrivalTime = api.buildArrivalTime(this.state.date);
+    console.log('arrival time is:', arrivalTime);
+
+    var that = this;
+    api.getTimeTravel(that.props.home, that.props.destination, that.state.transportation)
+      .then(function(data) {
+        var leaveTime = api.convertSecondsToTime(arrivalTime.value - data.rows[0].elements[0].duration.value);
+        console.log('leave time is:', leaveTime);
+        api.addUserDetails(that.props.auth, that.props.home, that.props.destination, that.state.transportation, data.rows[0].elements[0].duration, arrivalTime, leaveTime);
+
+        that.props.navigator.push({
+          title: 'CheckInfo',
+          component: CheckInfo,
+          passProps: {
+            colorArr: that.props.colorArr,
+            color: that.props.color,
+            auth: that.props.auth,
+            home: that.props.home,
+            destination: that.props.destination,
+            transportation: that.state.transportation,
+            duration: data.rows[0].elements[0].duration,
+            arrivalTime: arrivalTime,
+            leaveTime: leaveTime
+          }
+        });
+      });
   }
 
 
-  handleAddress(event) {
-    this.setState({
-      address: event.nativeEvent.text
-    });
+  handleArrivalTime(date) {
+     this.setState({
+       arrivalTime: date
+     });
+     console.log(this.state.arrivalTime);
+     console.log(this.state.timeZoneOffsetInHours);
   }
-
-  handleCity(event) {
-    this.setState({
-      city: event.nativeEvent.text
-    });
-  }
-
 
   render() {
-    
-    // Show an error if API request fails
-    var showErr = (
-      this.state.error ? <Text style={[styles.updateAlert, {color: this.props.colorArr[this.props.color].link}]}> {this.state.error} </Text> : <View></View>
-    );
 
     var PickerItemIOS = PickerIOS.Item;
-    var cars = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
+    var transportation = ["Driving", "Walking", "Bicycling", "Transit"];
 
     return (
       <View style={[styles.mainContainer, {backgroundColor: this.props.colorArr[this.props.color].bg}]}>
 
-        <Text style={styles.title}>Where do you head to everyday?</Text>
-
-        <Text style={styles.pageText}>Destination Address</Text>
-        <TextInput
-          placeholder='Home Address'
-          autoCapitalize='none'
-          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
-          value={this.state.home}
-          onChange={this.handleAddress.bind(this)} />
-
-        <Text style={styles.pageText}>City</Text>
-        <TextInput
-          placeholder='City'
-          autoCapitalize='none'
-          style={[styles.signupInput, {backgroundColor: this.props.colorArr[this.props.color].txt}]}
-          value={this.state.work}
-          onChange={this.handleCity.bind(this)} />
+        <Text style={styles.title}>What is your main mode of transportation?</Text>
 
         <PickerIOS
-          selectedValue={this.state.state}
-          onValueChange={(state) => this.setState({state})}>
-          {cars.map((state) => (
+          selectedValue={this.state.transportation}
+          onValueChange={(transportation) => this.setState({transportation})}>
+          {transportation.map((transportation) => (
             <PickerItemIOS
-              key={state}
-              value={state}
-              label={state} />
+              key={transportation}
+              value={transportation}
+              label={transportation} />
           )
         )}
         </PickerIOS>
-        <ActivityIndicatorIOS
-          animating={this.state.isLoading}
-          color='#111'
-          size='large' />
-        { showErr }
+
+        <DatePickerIOS
+          date={this.state.date}
+          mode="time"
+          minuteInterval={5}
+          onDateChange={(date) => this.setState({date})}
+        />
+
 
         <TouchableHighlight
           style={styles.button}
-          onPress={this.addDestinationAddress.bind(this)}
+          onPress={this.addTransportation.bind(this)}
           underlayColor='white' >
-            <Text style={styles.buttonText}> TEST </Text>
+            <Text style={styles.buttonText}> Submit </Text>
         </TouchableHighlight>
       </View>
     )
@@ -110,20 +113,8 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center'
   },
-  signupInput: {
-    paddingLeft: 5,
-    height: 50,
-    borderRadius: 8,
-    marginBottom: 10,
-    marginTop: 5,
-    alignSelf: 'stretch',
-    justifyContent: 'center'
-  },
   updateAlert: {
     textAlign: 'center'
-  },
-  pageText: {
-    color: '#fff'
   },
   title: {
     marginBottom: 15,
@@ -140,7 +131,7 @@ var styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 10,
-    marginTop: 15,
+    marginTop: 10,
     alignSelf: 'center',
     justifyContent: 'center'
   },
