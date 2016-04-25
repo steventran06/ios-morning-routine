@@ -71,7 +71,7 @@ class Transportation extends React.Component{
     return (
       <View style={[styles.mainContainer, {backgroundColor: this.props.colorArr[this.props.color].bg}]}>
 
-        <Text style={styles.title}>What is your main mode of transportation?</Text>
+        <Text style={styles.title}>How do you get there and by what time?</Text>
 
         <PickerIOS
           selectedValue={this.state.transportation}
@@ -91,7 +91,6 @@ class Transportation extends React.Component{
           minuteInterval={5}
           onDateChange={(date) => this.setState({date})}
         />
-
 
         <TouchableHighlight
           style={styles.button}
@@ -113,14 +112,13 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center'
   },
-  updateAlert: {
-    textAlign: 'center'
-  },
   title: {
-    marginBottom: 15,
     fontSize: 30,
     textAlign: 'center',
     color: '#fff'
+  },
+  updateAlert: {
+    textAlign: 'center'
   },
   button: {
     height: 45,

@@ -18,8 +18,7 @@ class Destination extends React.Component{
     this.state = {
       address: '',
       city: '',
-      state: '',
-      error: false
+      state: ''
     };
   }
 
@@ -55,12 +54,6 @@ class Destination extends React.Component{
 
 
   render() {
-    
-    // Show an error if API request fails
-    var showErr = (
-      this.state.error ? <Text style={[styles.updateAlert, {color: this.props.colorArr[this.props.color].link}]}> {this.state.error} </Text> : <View></View>
-    );
-
     var PickerItemIOS = PickerIOS.Item;
     var states = ["", "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
 
@@ -119,6 +112,12 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center'
   },
+  title: {
+    marginBottom: 15,
+    fontSize: 30,
+    textAlign: 'center',
+    color: '#fff'
+  },
   input: {
     paddingLeft: 5,
     height: 50,
@@ -128,16 +127,7 @@ var styles = StyleSheet.create({
     alignSelf: 'stretch',
     justifyContent: 'center'
   },
-  updateAlert: {
-    textAlign: 'center'
-  },
   pageText: {
-    color: '#fff'
-  },
-  title: {
-    marginBottom: 15,
-    fontSize: 30,
-    textAlign: 'center',
     color: '#fff'
   },
   button: {
