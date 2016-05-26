@@ -34,8 +34,8 @@ var api = {
     if (hours >= 13) {
       hours -= 12;
     }
-    if (minutes === 0) {
-      minutes = "00";
+    if (minutes < 10) {
+      minutes = "0" + minutes.toString();
     }
     var text = [hours,minutes].join(':') + ' ' + period;
 
