@@ -16,7 +16,7 @@ A daily morning routine tracker and commute manager to help anyone take control 
 
 ## Screenshots
 #### Login
-<img src="https://github.com/steventran06/ios-morning-routine/blob/master/README_IMGS/day-voyage-confirm.png" width="450">
+<img src="https://github.com/steventran06/ios-morning-routine/blob/master/README_IMGS/MorningRoutine.png" width="450">
 
 ## Up and running
 - Install dependencies
