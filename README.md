@@ -50,5 +50,5 @@ _**Morning Routine iOS is a iOS application built with:**_
 ###### [Sunrise Sunset API](http://sunrise-sunset.org/api) _External API_
 - Morning Routine iOS utilizes the **Sunrise Sunset API** to change the background color and styling based on how close to sunrise you wake up. It gathers this information by utilizing the user's coordinates from geolocation to get that timezone's sunrise time.
 
-###### [Google Maps Distance Matrix](https://developers.google.com/maps/documentation/distance-matrix/) _External API
+###### [Google Maps Distance Matrix](https://developers.google.com/maps/documentation/distance-matrix/) _External API_
 - **Google Distance Matrix** - Used to calculate the distance from the user's home and destination every morning, and the estimated travel time.
